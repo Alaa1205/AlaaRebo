@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct TryingApp: App {
     var body: some Scene {
         WindowGroup {
-            HomePage()
+            AgeSelectionView()
         }
+        .modelContainer(for: [Child.self])
     }
+    
 }

@@ -368,6 +368,7 @@
 //}
 
 import SwiftUI
+import SwiftData
 
 /// Word Model
 struct Word: Identifiable {
@@ -378,19 +379,124 @@ struct Word: Identifiable {
     var isCompleted: Bool
 }
 
+ //child info will be stored using swift sata
+@Model
+class Child : ObservableObject{
+     var age : Int
+     var currentWordIndex: Int
+    
+    init(age: Int, currentWordIndex: Int){
+        self.age = age
+        self.currentWordIndex = currentWordIndex
+    
+    }
+}
+
+
+
 var words: [Word] = [
     Word(word: "أرنب", imageName: "Rabbit", backgroundColor: "Pink", isCompleted: false),
     Word(word: "حصان", imageName: "Horse", backgroundColor: "Brown", isCompleted: false),
     Word(word: "بيت", imageName: "Home", backgroundColor: "Yellow", isCompleted: false)
 ]
 
+
+struct AgeSelectionView: View {
+    @State private var selectedAge: Int?  // Holds the selected age
+    @State private var child: Child?
+
+    let ages = [8, 7, 6, 5]  // Available age options
+
+    var body: some View {
+        NavigationStack {
+            VStack {
+                // Title
+                Text("اختر عمرك")
+                    .font(.system(size: 50, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(.top, 30)
+                
+                Spacer()  // Pushes content to center
+
+                // Balloons with Numbers in Center
+                HStack(spacing: 40) {
+                    ForEach(ages, id: \.self) { age in
+                        let destination = HomePage(child: Child(age: age, currentWordIndex: 0))
+                        NavigationLink(
+                            destination: destination,
+                            tag: age,
+                            selection: $selectedAge
+                        ) {
+                            BalloonView(number: age, isSelected: selectedAge == age)
+                                .onTapGesture {
+                                    selectedAge = age  // Set the selected age
+                                }
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+
+                Spacer()  // Pushes content to center
+            }
+            .background(Color(red: 255/255, green: 249/255, blue: 219/255))
+            .edgesIgnoringSafeArea(.all)
+        }
+    }
+}
+
+
+// Custom Balloon View
+struct BalloonView: View {
+    let number: Int
+    var isSelected: Bool
+
+    var body: some View {
+        VStack {
+            Circle()
+                .fill(balloonColor(for: number))
+                .frame(width: 100, height: 130)
+                .overlay(
+                    Text("\(number)")
+                        .font(.system(size: 40, weight: .bold))
+                        .foregroundColor(.white)
+                )
+                .scaleEffect(isSelected ? 2.6 : 1.8)  // Highlight selection
+                .animation(.spring(), value: isSelected)
+
+            // Balloon String
+            Path { path in
+                path.move(to: CGPoint(x: 80, y: 0))
+                path.addQuadCurve(to: CGPoint(x: 50, y: 80), control: CGPoint(x: 30, y:30 ))
+            }
+            .stroke(Color.black, lineWidth: 10)
+            .frame(height:150)
+        }
+    }
+
+    private func balloonColor(for number: Int) -> Color {
+        switch number {
+        case 8: return Color.pink
+        case 7: return Color.orange
+        case 6: return Color.blue
+        case 5: return Color.cyan
+        default: return Color.gray
+        }
+    }
+}
+
+
 struct HomePage: View {
     
-    @AppStorage("currentWordIndex") private var currentWordIndex = 0
+    //@State var currentWordIndex: Int
+    @ObservedObject var child: Child
+    //@AppStorage("currentWordIndex") private var currentWordIndex = 0
     //@State private var currentWordIndex = 0
     @State private var isActivityCompleted = false
     @State private var completedWords: [Bool] = [false, false, false]
-
+   
+    
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -414,9 +520,9 @@ struct HomePage: View {
                 .position(x: 200, y: 150)
                 
                 NavigationLink(destination: FlashcardView(
-                    currentWordIndex: $currentWordIndex,
+                    
                     isActivityCompleted: $isActivityCompleted,
-                    completedWords: $completedWords
+                    completedWords: $completedWords, child:child
                 )) {
                     Image("BrownHome")
                         .resizable()
@@ -436,12 +542,13 @@ struct HomePage: View {
 }
 
 struct FlashcardView: View {
-    @Binding var currentWordIndex: Int
+    //@Binding var currentWordIndex: Int
     @Binding var isActivityCompleted: Bool
     @Binding var completedWords: [Bool]
+    @ObservedObject var child: Child
 
     var body: some View {
-        let word = words[currentWordIndex]
+        let word = words[child.currentWordIndex]
 
         ZStack {
             Color(word.backgroundColor).edgesIgnoringSafeArea(.all)
@@ -460,9 +567,9 @@ struct FlashcardView: View {
                     .cornerRadius(10)
 
                 NavigationLink(destination: PyramidView(
-                    currentWordIndex: $currentWordIndex,
+                   
                     isActivityCompleted: $isActivityCompleted,
-                    completedWords: $completedWords
+                    completedWords: $completedWords, child:child
                 )) {
                     Text("التالي")
                         .font(.headline)
@@ -479,12 +586,13 @@ struct FlashcardView: View {
 }
 
 struct PyramidView: View {
-    @Binding var currentWordIndex: Int
+    //@Binding var currentWordIndex: Int
     @Binding var isActivityCompleted: Bool
     @Binding var completedWords: [Bool]
-
+    @ObservedObject var child : Child
+    
     var body: some View {
-        let word = words[currentWordIndex]
+        let word = words[child.currentWordIndex]
         let wordParts = splitWord(word.word)
 
         ZStack {
@@ -511,8 +619,7 @@ struct PyramidView: View {
                 .padding()
 
                 NavigationLink(destination: DragAndDropPyramidView(
-                    currentWordIndex: $currentWordIndex,
-                    completedWords: $completedWords
+                    completedWords: $completedWords, child:child
                 )) {
                     Text("التالي")
                         .font(.headline)
@@ -538,14 +645,18 @@ struct PyramidView: View {
 }
 
 struct DragAndDropPyramidView: View {
-    @Binding var currentWordIndex: Int
+   // @Binding var currentWordIndex: Int
     @Binding var completedWords: [Bool]
 
     @State private var droppedParts: [String?] = [nil, nil, nil, nil]
     @State private var isPartCorrect: [Bool] = [false, false, false, false]
 
+    @ObservedObject var child : Child
+    
+    @State private var navigateToHomePage = false  // Flag to trigger navigation
+    
     var wordParts: [String] {
-        let word = words[currentWordIndex]
+        let word = words[child.currentWordIndex]
         return splitWord(word.word)
     }
 
@@ -598,13 +709,28 @@ struct DragAndDropPyramidView: View {
                 //Check if all wordparts are placed in the correct place display the arrow and navigate the child to the home page
                 
                 if isPartCorrect.allSatisfy({ $0 }) {
-                    NavigationLink(destination: HomePage()) {
+                    // Button to trigger the navigation and call the function
+                    Button(action: {
+                        // Call the function before navigating
+                        markWordAsCompleted()
+
+                        // Set the flag to navigate to the next page
+                        navigateToHomePage = true
+                    }) {
                         Image(systemName: "arrow.backward.circle")
                             .resizable()
                             .foregroundStyle(Color.orange)
                             .frame(width: 78, height: 78)
                     }
+                    .background(
+                        NavigationLink(
+                            destination: HomePage(child: child),
+                            isActive: $navigateToHomePage,
+                            label: { EmptyView() }
+                        )
+                    )
                 }
+
             }
             .padding()
         }
@@ -639,6 +765,30 @@ struct DragAndDropPyramidView: View {
         }
         return false
     }
+    
+    func markWordAsCompleted() {
+        completedWords[child.currentWordIndex] = true
+//        if child.currentWordIndex < words.count - 1 {
+//                // البحث عن الكلمة التالية التي لم تكتمل بعد
+//            for i in (child.currentWordIndex + 1)..<words.count {
+//                    if !completedWords[i] {
+//                        child.currentWordIndex = i
+//                        
+//                    }else{
+//                        child.currentWordIndex += 1
+//                    }
+//                }
+//            }
+        
+        if  completedWords[child.currentWordIndex] == true && child.currentWordIndex <= words.count - 1 {
+            
+            child.currentWordIndex += 1
+            
+        }else{
+            child.currentWordIndex = 0
+        }
+    
+        }
 }
 
 
@@ -658,5 +808,5 @@ struct DraggablePart: View {
 }
 
 #Preview {
-    HomePage()
+    AgeSelectionView()
 }
