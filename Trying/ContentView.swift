@@ -386,7 +386,8 @@ var words: [Word] = [
 
 struct HomePage: View {
     
-    @State private var currentWordIndex = 0
+    @AppStorage("currentWordIndex") private var currentWordIndex = 0
+    //@State private var currentWordIndex = 0
     @State private var isActivityCompleted = false
     @State private var completedWords: [Bool] = [false, false, false]
 
@@ -558,42 +559,50 @@ struct DragAndDropPyramidView: View {
                     .bold()
                     .padding()
 
-                VStack(spacing: 30) {
-                    ForEach(0..<wordParts.count, id: \.self) { index in
-                        ZStack {
-                            Image("part\(index + 1)")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 600, height: 100)
+                
+                HStack{
+                    
+                    VStack(spacing: 30) {
+                        ForEach(0..<wordParts.count, id: \.self) { index in
+                            ZStack {
+                                Image("part\(index + 1)")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 600, height: 100)
 
-                            if let part = droppedParts[index] {
-                                Text(part)
-                                    .font(.largeTitle)
-                                    .foregroundColor(isPartCorrect[index] ? .green : .red)
+                                if let part = droppedParts[index] {
+                                    Text(part)
+                                        .font(.largeTitle)
+                                        .foregroundColor(isPartCorrect[index] ? .green : .red)
+                                }
+                            }
+                            .onDrop(of: [.text], isTargeted: nil) { providers in
+                                handleDrop(providers: providers, at: index)
                             }
                         }
-                        .onDrop(of: [.text], isTargeted: nil) { providers in
-                            handleDrop(providers: providers, at: index)
+                    }
+
+                    
+                    VStack {
+                        ForEach(wordParts, id: \.self) { part in
+                            if !droppedParts.contains(part) {
+                                DraggablePart(part: part)
+                            }
                         }
                     }
+                    
                 }
+                
+              
 
-                HStack {
-                    ForEach(wordParts, id: \.self) { part in
-                        if !droppedParts.contains(part) {
-                            DraggablePart(part: part)
-                        }
-                    }
-                }
-
+                //Check if all wordparts are placed in the correct place display the arrow and navigate the child to the home page
+                
                 if isPartCorrect.allSatisfy({ $0 }) {
                     NavigationLink(destination: HomePage()) {
-                        Text("التالي")
-                            .font(.headline)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                        Image(systemName: "arrow.backward.circle")
+                            .resizable()
+                            .foregroundStyle(Color.orange)
+                            .frame(width: 78, height: 78)
                     }
                 }
             }
