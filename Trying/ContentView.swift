@@ -494,10 +494,13 @@ struct HomePage: View {
     //@State private var currentWordIndex = 0
     @State private var isActivityCompleted = false
     @State private var completedWords: [Bool] = [false, false, false]
-   
+    
     
     
     var body: some View {
+        
+      
+        
         NavigationStack {
             ZStack {
                 Color("BackgroundColor").edgesIgnoringSafeArea(.all)
@@ -509,9 +512,26 @@ struct HomePage: View {
                     .frame(width: 1500, height: 3300)
                     .position(x: 700, y: 450)
                 
-                Button(action: {
-                    // Action for big home
-                }) {
+               
+                    ZStack{
+                        
+                        Circle().fill(Color("Circles")).frame(width: 100, height: 100).position(x: 464, y: 325)
+                            .shadow(color: Color("circleShadow") , radius: 12)
+                        
+                        
+                        
+                        
+                    
+                }
+                
+                
+                
+                
+                NavigationLink(destination: FlashcardView(
+                    
+                    isActivityCompleted: $isActivityCompleted,
+                    completedWords: $completedWords, child:child
+                )) {
                     Image("BigeHome")
                         .resizable()
                         .scaledToFit()
@@ -519,11 +539,9 @@ struct HomePage: View {
                 }
                 .position(x: 200, y: 150)
                 
-                NavigationLink(destination: FlashcardView(
-                    
-                    isActivityCompleted: $isActivityCompleted,
-                    completedWords: $completedWords, child:child
-                )) {
+                Button(action: {
+                    // Action for big home
+                }) {
                     Image("BrownHome")
                         .resizable()
                         .scaledToFit()
@@ -531,6 +549,8 @@ struct HomePage: View {
                 }
                 .position(x: 900, y: 550)
                 
+                
+
                 Image("character")
                     .resizable()
                     .scaledToFit()
@@ -551,36 +571,87 @@ struct FlashcardView: View {
         let word = words[child.currentWordIndex]
 
         ZStack {
-            Color(word.backgroundColor).edgesIgnoringSafeArea(.all)
+            Color("BackgroundColor").edgesIgnoringSafeArea(.all)
 
-            VStack {
-                Image(word.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 300)
-
-                Text(word.word)
-                    .font(.largeTitle)
-                    .bold()
-                    .padding()
-                    .background(Color(word.backgroundColor))
-                    .cornerRadius(10)
-
-                NavigationLink(destination: PyramidView(
-                   
-                    isActivityCompleted: $isActivityCompleted,
-                    completedWords: $completedWords, child:child
-                )) {
-                    Text("التالي")
-                        .font(.headline)
+//            VStack {
+//                Image(word.imageName)
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(height: 300)
+//
+//                Text(word.word)
+//                    .font(.largeTitle)
+//                    .bold()
+//                    .padding()
+//                    .background(Color(word.backgroundColor))
+//                    .cornerRadius(10)
+//
+//                NavigationLink(destination: PyramidView(
+//                   
+//                    isActivityCompleted: $isActivityCompleted,
+//                    completedWords: $completedWords, child:child
+//                )) {
+//                    Text("التالي")
+//                        .font(.headline)
+//                        .padding()
+//                        .background(Color.blue)
+//                        .foregroundColor(.white)
+//                        .cornerRadius(10)
+//                }
+//            }
+            
+            HStack{
+                // Left Side: Image
+                ZStack {
+                    
+                    Color("White")
+                    
+                    Image(word.imageName) // Replace with your image name
+                        .resizable()
+                        .scaledToFit()
                         .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+
+                        
+                    
                 }
+                .frame(width: 250, height: 350)
+                .cornerRadius(10)
+                
+                // Right Side: Text
+                ZStack {
+                    Color(word.backgroundColor) // Map string to color
+                        .opacity(1.0) // Ensure background visibility
+                    Text(word.word)
+                        .font(.largeTitle)
+                        .foregroundStyle(.black)// Text color
+                        .bold()
+                }
+                .frame(width: 250, height: 350)
+                .cornerRadius(10)
+                .overlay(
+                    Image(systemName: "speaker.wave.2.fill")
+                        .foregroundColor(.black)
+                        .padding(),
+                    alignment: .topTrailing
+                )
             }
-            .padding()
+            
+            NavigationLink(destination: PyramidView(
+            
+                                isActivityCompleted: $isActivityCompleted,
+                                completedWords: $completedWords, child:child, word:word
+                            )) {
+                                Image(systemName: "arrow.backward.circle")
+                                    .resizable()
+                                    .foregroundStyle(Color.orange)
+                                    .frame(width: 78, height: 78)
+                                
+                            }
+                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height - 120) // Centered at bottom
+
         }
+        
+        
         .navigationBarBackButtonHidden(true)
     }
 }
@@ -590,6 +661,8 @@ struct PyramidView: View {
     @Binding var isActivityCompleted: Bool
     @Binding var completedWords: [Bool]
     @ObservedObject var child : Child
+    
+    let word : Word
     
     var body: some View {
         let word = words[child.currentWordIndex]
@@ -621,12 +694,11 @@ struct PyramidView: View {
                 NavigationLink(destination: DragAndDropPyramidView(
                     completedWords: $completedWords, child:child
                 )) {
-                    Text("التالي")
-                        .font(.headline)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                    Image(systemName: "arrow.backward.circle")
+                        .resizable()
+                        .foregroundStyle(Color.orange)
+                        .frame(width: 78, height: 78)
+                    
                 }
             }
             .padding()
@@ -654,7 +726,7 @@ struct DragAndDropPyramidView: View {
     @ObservedObject var child : Child
     
     @State private var navigateToHomePage = false  // Flag to trigger navigation
-    
+    @State private var showCompletionPopup = false // Flag to show the completion popup
     var wordParts: [String] {
         let word = words[child.currentWordIndex]
         return splitWord(word.word)
@@ -694,13 +766,23 @@ struct DragAndDropPyramidView: View {
                     }
 
                     
-                    VStack {
-                        ForEach(wordParts, id: \.self) { part in
-                            if !droppedParts.contains(part) {
-                                DraggablePart(part: part)
+                    
+                    ZStack{
+                        
+                        Spacer()
+                        Rectangle().fill(Color("StichyNotes Rectangle")).frame(width: 140, height: 400).cornerRadius(20)
+                        
+                        
+                        VStack {
+                            ForEach(wordParts, id: \.self) { part in
+                                if !droppedParts.contains(part) {
+                                    DraggablePart(part: part)
+                                }
                             }
                         }
+                        
                     }
+                   
                     
                 }
                 
@@ -713,6 +795,8 @@ struct DragAndDropPyramidView: View {
                     Button(action: {
                         // Call the function before navigating
                         markWordAsCompleted()
+                        
+                        
 
                         // Set the flag to navigate to the next page
                         navigateToHomePage = true
@@ -767,7 +851,13 @@ struct DragAndDropPyramidView: View {
     }
     
     func markWordAsCompleted() {
+        
+        var word  = words[child.currentWordIndex]
+        word.isCompleted = true
+        
+        
         completedWords[child.currentWordIndex] = true
+        
 //        if child.currentWordIndex < words.count - 1 {
 //                // البحث عن الكلمة التالية التي لم تكتمل بعد
 //            for i in (child.currentWordIndex + 1)..<words.count {
@@ -796,14 +886,26 @@ struct DraggablePart: View {
     let part: String
 
     var body: some View {
-        Text(part)
-            .font(.headline)
-            .padding()
-            .background(Color("StickyNoteColor"))
-            .cornerRadius(10)
-            .onDrag {
-                NSItemProvider(object: part as NSString)
-            }
+        
+        ZStack{
+            
+            
+            Text(part)
+                .font(.headline)
+                .frame(width: 50, height: 50)
+                .padding()
+                .background(Color("StickyNoteColor"))
+                .cornerRadius(10)
+                .onDrag {
+                    NSItemProvider(object: part as NSString)
+                    
+                    
+                }
+            
+            
+            
+        }
+        
     }
 }
 
