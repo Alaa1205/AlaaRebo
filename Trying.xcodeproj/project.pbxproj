@@ -30,11 +30,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		614FAB472D184DDD009877E5 /* Trying */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Trying;
-			sourceTree = "<group>";
-		};
 		614FAB582D184DDE009877E5 /* TryingTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TryingTests;
@@ -43,6 +38,16 @@
 		614FAB622D184DDE009877E5 /* TryingUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TryingUITests;
+			sourceTree = "<group>";
+		};
+		61F9F1862D1B17820039FBA1 /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Models;
+			sourceTree = "<group>";
+		};
+		61F9F1F52D1B1C960039FBA1 /* Trying */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Trying;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,7 +80,8 @@
 		614FAB3C2D184DDD009877E5 = {
 			isa = PBXGroup;
 			children = (
-				614FAB472D184DDD009877E5 /* Trying */,
+				61F9F1F52D1B1C960039FBA1 /* Trying */,
+				61F9F1862D1B17820039FBA1 /* Models */,
 				614FAB582D184DDE009877E5 /* TryingTests */,
 				614FAB622D184DDE009877E5 /* TryingUITests */,
 				614FAB462D184DDD009877E5 /* Products */,
@@ -108,7 +114,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				614FAB472D184DDD009877E5 /* Trying */,
+				61F9F1862D1B17820039FBA1 /* Models */,
+				61F9F1F52D1B1C960039FBA1 /* Trying */,
 			);
 			name = Trying;
 			packageProductDependencies = (
