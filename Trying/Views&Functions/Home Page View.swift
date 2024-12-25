@@ -38,40 +38,61 @@ struct HomePage: View {
                     .position(x: 700, y: 450)
                 
                
-                    ZStack{
+                   
                         
                         
                         
-                        ForEach(completedWords.indices, id: \.self) { index in
-                           
-                            
-                            
-                            if completedWords[index] {
-                                
-                                HStack{
-                                    
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color("Circles"))
-                                            .frame(width: 100, height: 100)
-                                            
-                                            .shadow(color: Color("circleShadow"), radius: 12)
+//                        ForEach(completedWords.indices, id: \.self) { index in
+//                           
+//                            
+//                            
+//                            if completedWords[index] {
+//                                
+//                                HStack{
+//                                    
+//                                    ZStack {
+//                                        Circle()
+//                                            .fill(Color("Circles"))
+//                                            .frame(width: 100, height: 100)
+//                                            
+//                                            .shadow(color: Color("circleShadow"), radius: 12)
+//
+//                                        Text(word.word)
+//                                            .font(.largeTitle)
+//                                            .foregroundStyle(Color(.white))
+//                                            .bold()
+//                                    }
+//                                    
+//                                    
+//                                }
+//                            
+//                            }
+//                        }
+                VStack {
+                ForEach(completedWords.indices, id: \.self) { index in
+                    if completedWords[index] {
+                        let completedWord = words[index] // Fetch the word for the current index
+                        
+                        
+                            ZStack {
+                                Circle()
+                                    .fill(Color("Circles"))
+                                    .frame(width: 100, height: 100)
+                                    .shadow(color: Color("circleShadow"), radius: 12)
 
-                                        Text(word.word)
-                                            .font(.largeTitle)
-                                            .foregroundStyle(Color(.white))
-                                            .bold()
-                                    }
-                                    
-                                    
-                                }
-                            
+                                Text(completedWord.word) // Use the dynamically fetched word
+                                    .font(.largeTitle)
+                                    .foregroundStyle(Color(.white))
+                                    .bold()
                             }
                         }
+                    }
+                }
+
 
                         
                     
-                }
+                
                 
                 
                 
