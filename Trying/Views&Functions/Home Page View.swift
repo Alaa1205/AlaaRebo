@@ -14,15 +14,19 @@ struct HomePage: View {
     //@AppStorage("currentWordIndex") private var currentWordIndex = 0
     //@State private var currentWordIndex = 0
     @State private var isActivityCompleted = false
-    @State private var completedWords: [Bool] = [false, false, false]
+    @Binding  var completedWords: [Bool]
     
     
     
     var body: some View {
         
+        let word = words[child.currentWordIndex]
       
+        //var completedWords = [false, false, false]
         
         NavigationStack {
+            
+            
             ZStack {
                 Color("BackgroundColor").edgesIgnoringSafeArea(.all)
 
@@ -36,11 +40,35 @@ struct HomePage: View {
                
                     ZStack{
                         
-                        Circle().fill(Color("Circles")).frame(width: 100, height: 100).position(x: 464, y: 325)
-                            .shadow(color: Color("circleShadow") , radius: 12)
                         
                         
-                        
+                        ForEach(completedWords.indices, id: \.self) { index in
+                           
+                            
+                            
+                            if completedWords[index] {
+                                
+                                HStack{
+                                    
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color("Circles"))
+                                            .frame(width: 100, height: 100)
+                                            
+                                            .shadow(color: Color("circleShadow"), radius: 12)
+
+                                        Text(word.word)
+                                            .font(.largeTitle)
+                                            .foregroundStyle(Color(.white))
+                                            .bold()
+                                    }
+                                    
+                                    
+                                }
+                            
+                            }
+                        }
+
                         
                     
                 }
@@ -80,4 +108,7 @@ struct HomePage: View {
             }
         }
     }
+    
+    
+    
 }

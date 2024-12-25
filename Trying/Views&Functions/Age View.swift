@@ -11,6 +11,7 @@ struct AgeSelectionView: View {
     @State private var selectedAge: Int?  // Holds the selected age
     @State private var child: Child?
 
+    @State private var completedWords: [Bool] = [false, false, false]
     let ages = [8, 7, 6, 5]  // Available age options
 
     var body: some View {
@@ -29,7 +30,7 @@ struct AgeSelectionView: View {
                 HStack(spacing: 40) {
                     ForEach(ages, id: \.self) { age in
                         
-                        let destination = HomePage(child: Child(age: age, currentWordIndex: 0, currentLevelPrograss : 0))
+                        let destination = HomePage(child: Child(age: age, currentWordIndex: 0, currentLevelPrograss : 0), completedWords: $completedWords)
                         
                         NavigationLink(
                             destination: destination,

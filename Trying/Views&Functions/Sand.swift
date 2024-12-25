@@ -188,8 +188,9 @@ struct SandDrawView: View {
                             
                             Button(action: {
                                 // Call the function before navigating
-                                 markWordAsCompleted()
-                                navigateToHomePage = true
+                                completedWords[child.currentWordIndex] = true
+                                   markWordAsCompleted()
+                                   navigateToHomePage = true
                     
                             
                                                 }) {
@@ -203,11 +204,11 @@ struct SandDrawView: View {
                                                 }
                                                 .background(
                                                     NavigationLink(
-                                                        destination: HomePage(child: child),
+                                                        destination: HomePage(child: child,  completedWords: $completedWords),
                                                         isActive: $navigateToHomePage,
                                                         label: { EmptyView() }
                                                     )
-                                                )
+                                                ).navigationBarBackButtonHidden(true)
                             
                             
                                                 
@@ -236,22 +237,10 @@ struct SandDrawView: View {
     func markWordAsCompleted() {
         
         var word  = words[child.currentWordIndex]
+        
         word.isCompleted = true
         
         
-        completedWords[child.currentWordIndex] = true
-        
-//        if child.currentWordIndex < words.count - 1 {
-//                // البحث عن الكلمة التالية التي لم تكتمل بعد
-//            for i in (child.currentWordIndex + 1)..<words.count {
-//                    if !completedWords[i] {
-//                        child.currentWordIndex = i
-//
-//                    }else{
-//                        child.currentWordIndex += 1
-//                    }
-//                }
-//            }
         
         if   child.currentWordIndex < words.count - 1  {
             

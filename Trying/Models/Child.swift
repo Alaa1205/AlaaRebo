@@ -14,11 +14,13 @@ class Child : ObservableObject{
     var age : Int
     var currentWordIndex: Int
    var currentLevelPrograss : Int
+    //var completedWords: [Bool]
    
-   init(age: Int, currentWordIndex: Int, currentLevelPrograss : Int){
+    init(age: Int, currentWordIndex: Int, currentLevelPrograss : Int){
        self.age = age
        self.currentWordIndex = currentWordIndex
        self.currentLevelPrograss = currentLevelPrograss
+        //self.completedWords = completedWords
    
    }
 }

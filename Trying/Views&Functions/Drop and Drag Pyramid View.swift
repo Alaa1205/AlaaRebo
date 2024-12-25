@@ -42,15 +42,20 @@ struct DragAndDropPyramidView: View {
                     VStack(spacing: 30) {
                         ForEach(0..<wordParts.count, id: \.self) { index in
                             ZStack {
+                                
                                 Image("part\(index + 1)")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 600, height: 100)
+                                    
+                                
+                                
 
                                 if let part = droppedParts[index] {
                                     Text(part)
                                         .font(.largeTitle)
-                                        .foregroundColor(isPartCorrect[index] ? .green : .red)
+                                    
+                                        .foregroundColor(isPartCorrect[index] ? .black : .red)
                                 }
                             }
                             .onDrop(of: [.text], isTargeted: nil) { providers in
